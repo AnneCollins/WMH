@@ -1,0 +1,483 @@
+clear all;
+
+Demo = true;
+% in demo mode, run 1 model 2 participants with 
+
+%% load the data
+Dataset = 14;
+
+load(['DataSets/Expe',num2str(Dataset)])
+subjects_list = unique(expe_data(:,1)');
+
+%load(['Fits/FitRL2_dataset',num2str(Dataset)])
+%% set up models
+Ms = [];
+
+%% RL2 - 1 - Full
+
+curr_model = [];
+curr_model.name = 'RL2';
+curr_model.pnames = {'alphaRL-','alphaRL+','alphaWM-','alphaWM+','rho3','rho6',...
+    'forget','epsilon','stick','RLr0','WMr0'};
+curr_model.pfixed = zeros(1,11);
+curr_model.fixedvalue = nan(1,11);
+curr_model.thetamapping = 1:11;
+curr_model.pMin = zeros(1,11);curr_model.pMin(9)=-1;
+curr_model.pMax = ones(1,11);
+curr_model.ID = 'Full';
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{1}=curr_model;
+
+%% RL2 - 2 r0=0
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(10:11) = 1;
+curr_model.fixedvalue(10:11) = 0;
+curr_model.thetamapping = [1:9 nan(1:2)];
+curr_model.pMin(10:11) = [];
+curr_model.pMax(10:11) = [];
+curr_model.ID = 'r0=0';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{2}=curr_model;
+%% RL2 - 3 r0=1
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(10:11) = 1;
+curr_model.fixedvalue(10:11) = 1;
+curr_model.thetamapping = [1:9 nan(1:2)];
+curr_model.pMin(10:11) = [];
+curr_model.pMax(10:11) = [];
+curr_model.ID = 'r0=1';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{3}=curr_model;
+%%  RL2 -4 RLr0=1
+
+curr_model = Ms{1};
+% fix RLr0 to 1 (10)
+curr_model.name = 'RL2';
+curr_model.pfixed(10) = 1;
+curr_model.fixedvalue(10) = 1;
+curr_model.thetamapping = [1:9 nan 10];
+curr_model.pMin(11) = [];
+curr_model.pMax(11) = [];
+curr_model.ID = 'RLr0=1';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{4}=curr_model;
+%% RL2 - 5 WMr0=1
+
+curr_model = Ms{1};
+% fix WMr0 to 1 (11)
+curr_model.name = 'RL2';
+curr_model.pfixed(11) = 1;
+curr_model.fixedvalue(11) = 1;
+curr_model.thetamapping = [1:10 nan];
+curr_model.pMin(11) = [];
+curr_model.pMax(11) = [];
+curr_model.ID = 'WMr0=1';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{5}=curr_model;
+
+%% RL2 - 6 RLr0=0;WMr0=1
+
+curr_model = Ms{1};
+% fix r0 to 1 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(10:11) = 1;
+curr_model.fixedvalue(10:11) = [0 1];
+curr_model.thetamapping = [1:9 nan(1:2)];
+curr_model.pMin(10:11) = [];
+curr_model.pMax(10:11) = [];
+curr_model.ID = 'RLr0=0;WMr0=1';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{6}=curr_model;
+
+%% RL2 - 7 RLr0=1;WMr0=0
+
+curr_model = Ms{1};
+% fix WMr0 to 0  and RL r0 to 1(10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(10:11) = 1;
+curr_model.fixedvalue(10:11) = [1 0];
+curr_model.thetamapping = [1:9 nan(1:2)];
+curr_model.pMin(10:11) = [];
+curr_model.pMax(10:11) = [];
+curr_model.ID = 'RLr0=1;WMr0=0';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{7}=curr_model;
+
+%% Model 7 wins so far in the r0 sweep.
+
+%% RL2- 8. Full, no stick
+
+curr_model = Ms{1};
+% fix stick to 0 (9)
+curr_model.name = 'RL2';
+curr_model.pfixed(9) = 1;
+curr_model.fixedvalue(9) = 0;
+curr_model.thetamapping = [1:8 nan 9:10];
+curr_model.pMin(9) = [];
+curr_model.pMax(9) = [];
+curr_model.ID = 'stick=0';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{8}=curr_model;
+% stick doesn't help in full model
+
+%% RL2 - 9 RLr0=1;WMr0=0 no stick
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(9:11) = 1;
+curr_model.fixedvalue(9:11) = [0 1 0];
+curr_model.thetamapping = [1:8 nan(1,3)];
+curr_model.pMin(9:11) = [];
+curr_model.pMax(9:11) = [];
+curr_model.ID = 'RLr0=1;WMr0=0 no stick';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{9}=curr_model;
+% but 9 fits worse than 7, so stick helps
+
+
+%% RL2 - 10 - Full forget = 0 - Forget is needed
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(7) = 1;
+curr_model.fixedvalue(7) = 0;
+curr_model.thetamapping = [1:6 nan 7:10];
+curr_model.pMin(7) = [];
+curr_model.pMax(7) = [];
+curr_model.ID = 'forget=0';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{10}=curr_model;
+
+%% RL2 - 10 - Full epsilon = 0 - 
+
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(8) = 1;
+curr_model.fixedvalue(8) = 0;
+curr_model.thetamapping = [1:7 nan 8:10];
+curr_model.pMin(8) = [];
+curr_model.pMax(8) = [];
+curr_model.ID = 'epsilon=0';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{11}=curr_model;
+
+% forget, epsilon and stick are needed. 7 wins so far. 
+
+%% RL2 - 12 RLr0=1;WMr0=0 (stick, forget, epsilon) - w3 = w6
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed([6 10:11]) = 1;
+curr_model.fixedvalue([6 10:11]) = [1 1 0];
+curr_model.thetamapping = [1:5 nan 6:8 nan(1,2)];
+curr_model.pMin([6 10:11]) = [];
+curr_model.pMax([6 10:11]) = [];
+curr_model.ID = 'RLr0=1;WMr0=0 w3=w6';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{12}=curr_model;
+
+% all needed so far except the r0s
+
+%% models to consider - shared learning rates
+%%  RL2 - 13 - Full alphaRL = alphaRL- 
+
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+%curr_model.pfixed(8) = 1;
+%curr_model.fixedvalue(8) = 0;
+curr_model.thetamapping = [1 1:10];
+curr_model.pMin(2) = [];
+curr_model.pMax(2) = [];
+curr_model.ID = 'shared alphaRL';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{13}=curr_model;
+
+%%  RL2 - 14 - Full alphaWM = alphaWM- 
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+%curr_model.pfixed(8) = 1;
+%curr_model.fixedvalue(8) = 0;
+curr_model.thetamapping = [1:3 3:10];
+curr_model.pMin(4) = [];
+curr_model.pMax(4) = [];
+curr_model.ID = 'shared alphaWM';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{14}=curr_model;
+
+% 14 is better than 1 but not 7, 14 is not better than either
+% try 7 with shared alphaWM
+
+%% RL2 - 15 RLr0=1;WMr0=0, alphaWM = alpha-WM
+
+curr_model = Ms{1};
+% fix r0 to 0 (10-11)
+curr_model.name = 'RL2';
+curr_model.pfixed(10:11) = 1;
+curr_model.fixedvalue(10:11) = [1 0];
+curr_model.thetamapping = [1:3 3:8 nan(1:2)];
+curr_model.pMin([4 10:11]) = [];
+curr_model.pMax([4 10:11]) = [];
+curr_model.ID = 'RLr0=1;WMr0=0 alphaWM=alphaWM-';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{15}=curr_model;
+% doesn't help
+
+%% RL2 - 16 - much simpler model (RL1)
+
+curr_model = [];
+curr_model.name = 'RL2';
+curr_model.pnames = {'alphaRL-','alphaRL','alphaWM-','alphaWM','rho3','rho6',...
+    'forget','epsilon','stick','RLr0','WMr0'};
+curr_model.pfixed = zeros(1,11);
+curr_model.pfixed([1 2 5 8 10:11])=1;
+curr_model.fixedvalue = nan(1,11);
+curr_model.fixedvalue([1 2 5 8 10:11]) = [0 0 1 0 1 0];
+curr_model.thetamapping = nan(1,11);
+curr_model.thetamapping(curr_model.pfixed==0)=1:5;
+curr_model.pMin = zeros(1,5);curr_model.pMin(5)=-1;
+curr_model.pMax = ones(1,5);
+curr_model.ID = 'WMf';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{16}=curr_model;
+
+%% RL2 - 17 - much simpler model (RL1) - shared neg learning rate
+
+curr_model = [];
+curr_model.name = 'RL2';
+curr_model.pnames = {'alphaRL-','alphaRL','alphaWM-','alphaWM+','rho3','rho6',...
+    'forget','epsilon','stick','RLr0','WMr0'};
+curr_model.pfixed = zeros(1,11);
+curr_model.pfixed([1 2 5 8 10:11])=1;
+curr_model.fixedvalue = nan(1,11);
+curr_model.fixedvalue([1 2 5 8 10:11]) = [0 0 1 0 1 0];
+curr_model.thetamapping = nan(1,11);
+curr_model.thetamapping(curr_model.pfixed==0)=[1 1:4];
+curr_model.pMin = zeros(1,4);curr_model.pMin(4)=-1;
+curr_model.pMax = ones(1,4);
+curr_model.ID = 'WMf-sharedalpha';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{17}=curr_model;
+
+%% RL2 - 18 - much simpler model (RL1) - no forget
+
+curr_model = [];
+curr_model.name = 'RL2';
+curr_model.pnames = {'alphaRL-','alphaRL','alphaWM-','alphaWM','rho3','rho6',...
+    'forget','epsilon','stick','RLr0','WMr0'};
+curr_model.pfixed = zeros(1,11);
+curr_model.pfixed([1 2 5 7 8 10:11])=1;
+curr_model.fixedvalue = nan(1,11);
+curr_model.fixedvalue([1 2 5 7 8 10:11]) = [0 0 1 0 0 1 0];
+curr_model.thetamapping = nan(1,11);
+curr_model.thetamapping(curr_model.pfixed==0)=1:4;
+curr_model.pMin = zeros(1,4);curr_model.pMin(4)=-1;
+curr_model.pMax = ones(1,4);
+curr_model.ID = 'RL1';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{18}=curr_model;
+
+%% RL2 - 19 - much simpler model (RL1) - no rho6
+
+curr_model = [];
+curr_model.name = 'RL2';
+curr_model.pnames = {'alphaRL-','alphaRL','alphaWM-','alphaWM','rho3','rho6',...
+    'forget','epsilon','stick','RLr0','WMr0'};
+curr_model.pfixed = zeros(1,11);
+curr_model.pfixed([1 2 5 7 8 10:11])=1;
+curr_model.fixedvalue = nan(1,11);
+curr_model.fixedvalue([1 2 5 7 8 10:11]) = [0 0 1 0 0 1 0];
+curr_model.thetamapping = nan(1,11);
+curr_model.thetamapping(curr_model.pfixed==0)=1:4;
+curr_model.pMin = zeros(1,4);curr_model.pMin(4)=-1;
+curr_model.pMax = ones(1,4);
+curr_model.ID = 'WMf -rho3=6 = 1';
+curr_model.param_names = [];
+for t=1:length(curr_model.pMin)
+    curr_model.param_names{t} = curr_model.pnames{find(curr_model.thetamapping==t)};
+end
+testconsistency(curr_model);
+
+Ms{19}=curr_model;
+% need forgetting and rho3 vs. rho6.
+
+%% models to consider
+toconsider = [1:19];%19;
+
+%% optimizer options
+options = optimoptions('fmincon','Display','off');
+% number of starting points
+if demo
+    niter = 2;
+    toconsider = toconsider(end);
+    subjects_list = subjects_list(1:2);
+else
+    niter=10;
+    toconsider = toconsider;
+end
+    
+    
+%% fitting
+
+for m=toconsider%(toconsider>8)
+    %%
+    fit_model = Ms{m};
+    pmin = fit_model.pMin;
+    pmax = fit_model.pMax;
+
+    k=0;
+    fitmeasures = [];
+    fitparams = [];
+    %%
+    for s = subjects_list%([4])
+        %%
+        k=find(subjects_list==s);
+        [m k length(subjects_list)]
+        tic;
+        X = expe_data(expe_data(:,1)==s,[5,10,13,3,2,14]);
+        X(X(:,6)==-1,:) = [];
+        % stim, action, reward, set size, block,rt
+        data = X;
+
+        %%
+        sofar= [];
+        j=0;
+        pars  = repmat(pmin,niter,1)+rand(niter,length(pmin)).*repmat(pmax-pmin,niter,1);
+        eval(['myfitfun = @(p) ',fit_model.name,'_llh(p,data,fit_model);'])
+            for it = 1:niter
+                par = pars(it,:);
+                j=j+1;
+                [p,fval,exitflag,output,lambda,grad,hessian] = ...
+                            fmincon(myfitfun,par,[],[],[],[],pmin,pmax,[],options);
+
+                    sofar(j,:)=[p,fval];
+            end
+
+        %%
+
+
+        [llh,i]=min(sofar(:,end));
+        param = sofar(i(1),1:end-1);
+        [s param llh]
+        [m k length(subjects_list) toc]
+        ntrials = size(data,1);
+
+        % add one for capacity
+        AIC = 2*llh + 2*(length(param));
+        BIC = 2*llh + log(ntrials)*(length(param));
+        AIC0 = -2*log(1/3)*ntrials;
+        psr2 = (AIC0-AIC)/AIC0;
+
+        fitmeasures(k,:) = [s -llh AIC BIC psr2 AIC0];
+        fitparams(k,:) = param;
+    end
+
+All_Params{m} = fitparams;
+All_fits(:,:,m) = fitmeasures;
+save(['NewFits/FitRL2_dataset',num2str(Dataset)],'Ms','All_Params','All_fits','subjects_list') 
+end
+
+save(['NewFits/FitRL2_dataset',num2str(Dataset)],'Ms','All_Params','All_fits','subjects_list') 
