@@ -19,16 +19,17 @@ n=19;
 remapping = [1:n];
 
 ticnames =[];
-toconsider = [1:7 16];%
-
-sorted_toconsider = [];
-for m = remapping%(1:10)
-    if find(toconsider==m)
-        sorted_toconsider = [sorted_toconsider m];
-        toconsider(toconsider==m)=[];
-    end
-end
-toconsider = sorted_toconsider;
+toconsider = [1:2 6 5 3:4 7 16];%
+% toconsider = [1:7 16];
+% 
+% sorted_toconsider = [];
+% for m = remapping%(1:10)
+%     if find(toconsider==m)
+%         sorted_toconsider = [sorted_toconsider m];
+%         toconsider(toconsider==m)=[];
+%     end
+% end
+% toconsider = sorted_toconsider;
 
     load(['Fits/FitRL2_dataset14'])
 for i=1:length(toconsider)
@@ -62,15 +63,44 @@ mAICs =AICs - repmat(mean(AICs(:,toconsider),2),1,size(AICs,2));
 % xtickangle(45)
 
 %%
-[alpha,exp_r,xp,pxp,bor] = spm_BMS(-AICs(:,toconsider));
-[ma,mi]=max(pxp);
-%subplot(3,2,count)
-bar(exp_r,'facecolor',[.5 .5 .5])
-title(['Dataset ',num2str(dataset),'; pxp(best)=',num2str(ma)])
-set(gca,'xtick',1:length(toconsider),'xticklabels',ticnames,'fontsize',14)
-ylabel('exp_r')
-xtickangle(45)
-box off
+% [alpha,exp_r,xp,pxp,bor] = spm_BMS(-AICs(:,toconsider));
+% [ma,mi]=max(pxp);
+% %subplot(3,2,count)
+% bar(exp_r,'facecolor',[.5 .5 .5])
+% title(['Dataset ',num2str(dataset),'; pxp(best)=',num2str(ma)])
+% set(gca,'xtick',1:length(toconsider),'xticklabels',ticnames,'fontsize',14)
+% ylabel('exp_r')
+% xtickangle(45)
+% box off
+
+  %% mean AICs
+    
+    [~,best]= min(mean(mAICs(:,toconsider))); 
+    mAICs = mAICs(:,toconsider)-repmat(mAICs(:,toconsider(best)),1,length(toconsider));
+    subplot(1,2,1)
+    bar(mean(mAICs),'facecolor',[.5 .5 .5])
+    hold on
+    errorbar(mean(mAICs), std(mAICs)/sqrt(size(mAICs,1)),'.k')
+    box off
+    %ylim([0 .75])
+    title(['best=',ticnames{best}])
+    set(gca,'xtick',1:length(toconsider),'xticklabels',ticnames,'fontsize',12)
+    ylabel('\Delta AIC')
+    xtickangle(45)
+    
+    %% Proportion best fit. 
+    [~,best]= min(mAICs,[],2);
+    for m=1:length(toconsider)
+        prop(m)=mean(best==m);
+    end
+    subplot(1,2,2)
+    bar(prop,'facecolor',[.5 .5 .5])
+    box off
+    [~,bestmodel] = max(prop);
+    title(['best=',ticnames{bestmodel}])
+    set(gca,'xtick',1:length(toconsider),'xticklabels',ticnames,'fontsize',12)
+    ylabel('Proportion best fit')
+    xtickangle(45)
 end
 
 %% load parameters

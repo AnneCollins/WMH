@@ -9,7 +9,7 @@
 
 clear all
 
-%% exceedance probability package - not used
+%% exceedance probability package - not use
 % cd ..
 % SPMPackages = [pwd,'/spm12/'];
 % addpath(genpath(SPMPackages));
@@ -23,7 +23,7 @@ remapping = [remapping 10+remapping 20+remapping 31:40 40+remapping ...
 
 ticnames =[];
 %% for supplementary figure 6, select models 1:10
-%toconsider =1:10;
+toconsider =1:10;
 %% for figure 2A, select models below;
 toconsider = [9 6 2 8 26 38 42];% list for the first paper submission.
 %% Supplementary figure with free WM alpha+ or RL forgetting  or bias or no WM>K(S7)

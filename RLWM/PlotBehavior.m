@@ -108,7 +108,6 @@ for Dataset = ds% loop over data sets
     ylim([.2 1])
     
     maxns = size(errors,2);
-    
     %% plotting - error pattern
     subplot(3,length(ds),kd+length(ds))
     hold on

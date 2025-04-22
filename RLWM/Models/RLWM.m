@@ -59,6 +59,7 @@ else
     or = [1,1];
 end
 
+
 %% set up the simulation experiment
 
 % extract relevant experimental data
@@ -131,7 +132,7 @@ for bl = blocks
         % compute RL/H RPE
         rpe = or(r+1)-(wint*WM(s,choice) + (1-wint)*Q(s,choice));
         % update RL/H
-        Q(s,choice) = Q(s,choice) + alphaRL(r+1)*rpe;
+        Q(s,choice) = Q(s,choice) + alphaRL(r+1)*(or(r+1)-(wint*WM(s,choice) + (1-wint)*Q(s,choice)));
         %update WM
         WM(s,choice) = WM(s,choice) + alphaWM(r+1)*(r-WM(s,choice));
 
@@ -197,7 +198,7 @@ function delay = computedelay(stimuli,rewards);
 delay = nan*stimuli;
 for s=unique(stimuli')
     T = find(stimuli==s);
-    for t = T(2:end)
+    for t = T(2:end)'
         y = find(stimuli(1:t-1)==s&rewards(1:t-1)==1,1,'last');
         if ~isempty(y)
             delay(t)=t-y;

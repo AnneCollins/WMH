@@ -6,22 +6,14 @@
 
 % This function computes the log-likelihood llh of the data under parameters
 % (theta,K) for model M.
-% this is for models 61-80, which add new mechanisms. 
+% this is for models 91-100, which add new mechanisms. 
 
-function llh = RLWM_R1_llh(theta,K,data,M)
-% 
-% 
-% if nargin<4
-% plotting=0;
-% end
+function llh = RLWM_R2_llh(theta,K,data,M)
+
 
 nA = 3;
 beta = 25;
 
-% M.pnames = {'alphaRL','stick','rho','forget','epsilon','biasWM','biasRL','K'};
-% M.pfixed = [0 0 0 0 0 1 1 0];
-% M.fixedvalue = [nan nan nan nan nan 0 0 nan];
-% M.thetamapping = [1 2 3 4 5 nan nan 6];
 
 alpha = theta(M.thetamapping(1));%.2;
 stick = theta(M.thetamapping(2));
@@ -41,38 +33,14 @@ else
     biasRL = theta(M.thetamapping(7));
 end
 
+r0=0;
+alphaWM1=1;
+forgetRL = 0;
 
-if M.pfixed(8)
-    r0 = M.fixedvalue(8);
-else
-    r0 = theta(M.thetamapping(8));
-end
-if length(M.pfixed)<10
-    chunk = 0;
-elseif M.pfixed(9)
-    chunk = M.fixedvalue(9);
-else
-    chunk = theta(M.thetamapping(9));
-end
+actionbias1 = theta(M.thetamapping(8));
+actionbias2 = theta(M.thetamapping(9));
 
-% extend the RL part of the model
-
-
-if length(M.pfixed)<12
-    alphaWM1 = 1;
-    forgetRL = 0;
-else
-    if M.pfixed(10)
-        alphaWM1 = M.fixedvalue(10);
-    else
-        alphaWM1 = theta(M.thetamapping(10));
-    end
-    if M.pfixed(11)
-        forgetRL = M.fixedvalue(11);
-    else
-        forgetRL = theta(M.thetamapping(11));
-    end
-end
+policyPref = [actionbias1 (1-actionbias1)*actionbias2 (1-actionbias1)*(1-actionbias2)];
 
 alphaRL = [alpha*biasRL alpha];
 alphaWM = [biasWM*alphaWM1 1*alphaWM1];
@@ -129,10 +97,10 @@ for k = 2:length(choices)
       
     W = Q(stimuli(k),:)+stick*side;%+chunk*mean(Q);
     bRL = exp(beta*W);
-    bRL = epsilon/nA + (1-epsilon)*bRL/sum(bRL);
+    bRL = epsilon*policyPref + (1-epsilon)*bRL/sum(bRL);
     W = WM(stimuli(k),:)+stick*side;
     bWM = exp(beta*W);
-    bWM = epsilon/nA + (1-epsilon)*bWM/sum(bWM);
+    bWM = epsilon*policyPref + (1-epsilon)*bWM/sum(bWM);
     
     b = w*bWM + (1-w)*bRL;
     lt = log(b(choices(k)));

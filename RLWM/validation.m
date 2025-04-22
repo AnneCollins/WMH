@@ -19,10 +19,16 @@ dnames = {'CF12','SZ','EEG','fMRI','Dev','GL'};
 % use a smaller number (e.g. 2) for faster runtime. 
 % runtime with niter=2 is 75s.
 tic
-niter = 2;%20;%
+niter = 20;%
 
-% final list for paper
+% final list for paper - change model number to see validation for other
+% models
 ms = [9 6 2 8 26 38 42];
+% ms = 81; % Model WMRLH
+% ms = 92; % best RLWM + bias
+% ms = 106; % best RLWM with no WM over capacity
+% ms = 2;% best basic RLWM
+% ms = 26; % winning WMH model
 %%
 for dk=[1:6]
 Dataset = Datasets(dk);
@@ -51,7 +57,7 @@ neglectColors = [[0 0 0];[.5 .5 .5]];
 mk = 0;
 for m=ms;
     mk = mk+1;
-load(['Fits/FitRLWM_dataset',num2str(Dataset)],'Ms','All_Params')
+load(['NewFits/FitRLWM_dataset',num2str(Dataset)],'Ms','All_Params')
 
 params = All_Params{m};
 %%
